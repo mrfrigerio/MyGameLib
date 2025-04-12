@@ -14,11 +14,12 @@ datasource db {
 }
 
 model User {
-  id            Int       @id @default(autoincrement())
+  id            Int        @id @default(autoincrement())
   name          String
-  email         String    @unique
+  email         String     @unique
   password_hash String
   addresses     Address[]
+  userGames     UserGame[]
 }
 
 model Address {
@@ -33,4 +34,25 @@ model Address {
   complement   String?
   user         User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       Int?
+}
+
+model Game {
+  id          Int        @id @unique
+  name        String
+  description String?
+  imageUrl    String
+  metacritic  Int?
+  userGames   UserGame[]
+}
+
+model UserGame {
+  userId  Int
+  gameId  Int
+  addedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@id([userId, gameId])
+  @@map("user_games") // opcional: define nome da tabela pivot
 }

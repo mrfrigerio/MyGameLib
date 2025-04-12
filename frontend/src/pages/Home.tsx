@@ -1,5 +1,11 @@
 import React, { useRef, useEffect } from "react";
-import { Box, Stack, Typography, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Stack,
+  Typography,
+  CircularProgress,
+  LinearProgress,
+} from "@mui/material";
 import Masonry from "@mui/lab/Masonry";
 import { GameCard } from "../components/GameCard";
 import { HomeDropdown } from "../components/HomeDropdown";
@@ -18,15 +24,12 @@ export const Home: React.FC = () => {
   const platforms = methods.watch("platforms");
   const ordering = methods.watch("ordering");
 
-  useEffect(() => {
-    console.log("Ordering:", ordering);
-    console.log("Platforms:", platforms);
-  }, [platforms, ordering]);
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useGames({
-    search,
-    ordering,
-    platforms,
-  });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+    useGames({
+      search,
+      ordering,
+      platforms,
+    });
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -110,14 +113,22 @@ export const Home: React.FC = () => {
           </Stack>
         </FormProvider>
       </Stack>
-
-      <Masonry spacing={3} columns={{ xs: 1, sm: 2, md: 3, lg: 4, xl: 5 }}>
-        {games.map((game: any) => (
-          <Box key={game.id} sx={{ display: "flex", width: "100%" }}>
-            <GameCard gameData={game} />
-          </Box>
-        ))}
-      </Masonry>
+      {isLoading ? (
+        <Box sx={{ textAlign: "center", mr: 3 }}>
+          <LinearProgress
+            color="secondary"
+            sx={{ backgroundColor: "#308fe8" }}
+          />
+        </Box>
+      ) : (
+        <Masonry spacing={3} columns={{ xs: 1, sm: 2, md: 3, lg: 4, xl: 5 }}>
+          {games.map((game: any) => (
+            <Box key={game.id} sx={{ display: "flex", width: "100%" }}>
+              <GameCard gameData={game} />
+            </Box>
+          ))}
+        </Masonry>
+      )}
 
       <Box ref={observerRef} sx={{ p: 4, textAlign: "center" }}>
         {isFetchingNextPage && <CircularProgress />}

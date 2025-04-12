@@ -1,6 +1,8 @@
+// src/games/games.controller.ts
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { GamesService } from './games.service';
+import { QueryGamesDto } from './dto/query-games.dto';
 
 @ApiTags('Jogos')
 @Controller('games')
@@ -9,17 +11,18 @@ export class GamesController {
 
   @Get()
   @ApiOperation({ summary: 'Listar jogos' })
-  async listAll(
-    @Query('page') page: number = 1,
-    @Query('search') search: string,
-    @Query('ordering') ordering: string,
-    @Query('platforms') platforms: number,
-  ) {
-    return this.gamesService.listAll({ page, search, ordering, platforms });
+  async listAll(@Query() query: QueryGamesDto) {
+    return this.gamesService.listAll(query);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Listar jogos por ID' })
+  @ApiParam({
+    name: 'id',
+    type: Number,
+    description: 'ID do jogo a ser consultado',
+    example: 35358,
+  })
   async listById(@Param('id') id: string) {
     return this.gamesService.listById(id);
   }

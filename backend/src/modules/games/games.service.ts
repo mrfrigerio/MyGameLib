@@ -9,10 +9,10 @@ export class GamesService {
     ordering,
     platforms,
   }: {
-    page: number;
-    search: string;
-    ordering: string;
-    platforms: number;
+    page?: number;
+    search?: string;
+    ordering?: string;
+    platforms?: number;
   }): Promise<RawgGamesResponse> {
     const response = await rawgApi.get<RawgGamesResponse>(
       `/games?page=${page}`,

@@ -119,7 +119,7 @@ export class UsersService {
     }
 
     //Update addresses
-    if (addresses?.length > 0) {
+    if (addresses && addresses?.length > 0) {
       await this.prisma.address.deleteMany({
         where: { userId: id },
       });
@@ -135,7 +135,7 @@ export class UsersService {
           : existingUser.password_hash,
         addresses: {
           createMany: {
-            data: addresses,
+            data: addresses || [],
           },
         },
       },
