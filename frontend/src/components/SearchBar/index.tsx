@@ -48,9 +48,7 @@ const SearchBar: React.FC<{
         <SearchIcon />
       </IconButton>
       <StyledInputBase
-        placeholder={`Pesquise por ${
-          games?.toLocaleString("pt-BR") ?? ""
-        } jogos...`}
+        placeholder={"Pesquisar jogos..."}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onKeyPress={handleKeyPress}

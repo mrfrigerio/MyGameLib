@@ -6,6 +6,7 @@ import { ToastContainer } from "react-toastify";
 import { darkTheme } from "./styles/theme";
 import Routes from "./routes";
 import GlobalStyles from "./styles/GlobalStyles";
+import { SearchProvider } from "./context/Search";
 function App() {
   const queryClient = new QueryClient();
   return (
@@ -28,7 +29,9 @@ function App() {
               theme="colored"
               toastStyle={{ whiteSpace: "pre-line" }}
             />
-            <Routes />
+            <SearchProvider>
+              <Routes />
+            </SearchProvider>
           </Box>
         </ThemeProvider>
       </AuthProvider>

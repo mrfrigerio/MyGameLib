@@ -9,8 +9,6 @@ interface DropdownProps {
   values: string[];
   placeholder: string;
   name: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  // control: any;
 }
 
 export const Dropdown: React.FC<DropdownProps> = ({

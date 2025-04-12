@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { api } from "../components/service/api";
+import { api } from "../service/api";
 
 type SignInCredentials = {
   email: string;
@@ -39,7 +39,7 @@ type updateCredentials = {
   }[];
 };
 
-interface AuthContext {
+interface IAuthContext {
   user: User | undefined;
   isLogged: boolean;
   signIn: (signInCredentials: SignInCredentials) => Promise<User | undefined>;
@@ -49,7 +49,7 @@ interface AuthContext {
   signOut: () => void;
 }
 
-const AuthContext = React.createContext({} as AuthContext);
+const AuthContext = React.createContext({} as IAuthContext);
 AuthContext.displayName = "AuthContext";
 
 interface AuthProviderProps {
@@ -160,4 +160,4 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   );
 };
 
-export const useAuth = (): AuthContext => useContext(AuthContext);
+export const useAuth = (): IAuthContext => useContext(AuthContext);

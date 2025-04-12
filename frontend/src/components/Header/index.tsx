@@ -21,6 +21,7 @@ import logoImg from "../../assets/my-game-library-logo.png";
 import logoImgWhite from "../../assets/my-game-library-logo.png";
 import SearchBar from "../SearchBar";
 import { useNavigate } from "react-router";
+import { useSearch } from "../../context/Search";
 
 interface IHeaderProps {
   handleDrawerToggle: () => void;
@@ -29,6 +30,7 @@ interface IHeaderProps {
 export const Header: React.FC<IHeaderProps> = ({ handleDrawerToggle }) => {
   const { isLogged, user, signOut } = useAuth();
   const theme = useTheme();
+  const { setSearchParam } = useSearch();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
@@ -97,7 +99,7 @@ export const Header: React.FC<IHeaderProps> = ({ handleDrawerToggle }) => {
             />
           )}
         </Box>
-        <SearchBar games={879323} onSearch={(query) => console.log(query)} />
+        <SearchBar onSearch={setSearchParam} />
         {isLogged && (
           <>
             <Tooltip

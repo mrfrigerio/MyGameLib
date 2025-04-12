@@ -18,7 +18,7 @@ const MenuProps = {
 };
 
 interface DropdownProps {
-  values: string[];
+  values: { label: string; value: string | number }[];
   placeholder: string;
   name: string;
   control: Control;
@@ -64,7 +64,7 @@ export const HomeDropdown: React.FC<DropdownProps> = ({
 
               return (
                 <Typography variant="caption" sx={{ ml: 2 }}>
-                  {selected}
+                  {values.find((item) => item.value === selected)?.label}
                 </Typography>
               );
             }}
@@ -83,9 +83,9 @@ export const HomeDropdown: React.FC<DropdownProps> = ({
             <MenuItem disabled value="">
               <Typography variant="caption">{placeholder}</Typography>
             </MenuItem>
-            {values.map((value) => (
-              <MenuItem key={value} value={value}>
-                {value}
+            {values.map(({ label, value }) => (
+              <MenuItem key={label + "-" + value} value={value}>
+                {label}
               </MenuItem>
             ))}
           </Select>

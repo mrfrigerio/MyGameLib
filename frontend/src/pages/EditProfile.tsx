@@ -1,17 +1,47 @@
-import React from "react";
-import { Box, Stack, Typography } from "@mui/material";
+import React, { useEffect, useRef } from "react";
+import { Box, CircularProgress, Stack, Typography } from "@mui/material";
 import Masonry from "@mui/lab/Masonry";
 import { GameCard } from "../components/GameCard";
 import { EditProfileForm } from "../components/EditProfileForm";
 import { FormProvider, useForm } from "react-hook-form";
 import { HomeDropdown } from "../components/HomeDropdown";
 import { useNavigate } from "react-router";
+import { useGames } from "../hooks/useGames";
+import { useSearch } from "../context/Search";
 
 export const EditProfile: React.FC = () => {
   const [isOpen, setIsOpen] = React.useState(true);
-  const filledArray = Array.from({ length: 100 }, (_, i) => i + 1);
   const methods = useForm();
+  const observerRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
+
+  const { search } = useSearch();
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useGames({
+    search,
+    queryKey: search || "",
+  });
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 1.0 }
+    );
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observer.unobserve(observerRef.current);
+      }
+    };
+  }, [hasNextPage, fetchNextPage]);
+
+  const games = data?.pages.flatMap((page) => page.results) || [];
 
   return (
     <Box
@@ -80,17 +110,17 @@ export const EditProfile: React.FC = () => {
         </FormProvider>
       </Stack>
 
-      <Masonry
-        spacing={3}
-        sx={{}}
-        columns={{ xs: 1, sm: 2, md: 3, lg: 4, xl: 5 }}
-      >
-        {filledArray.map((_, index) => (
-          <Box key={index} sx={{ display: "flex", width: "100%" }}>
-            <GameCard />
+      <Masonry spacing={3} columns={{ xs: 1, sm: 2, md: 3, lg: 4, xl: 5 }}>
+        {games.map((game: any) => (
+          <Box key={game.id} sx={{ display: "flex", width: "100%" }}>
+            <GameCard gameData={game} />
           </Box>
         ))}
       </Masonry>
+
+      <Box ref={observerRef} sx={{ p: 4, textAlign: "center" }}>
+        {isFetchingNextPage && <CircularProgress />}
+      </Box>
     </Box>
   );
 };
