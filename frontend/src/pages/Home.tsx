@@ -23,6 +23,7 @@ export const Home: React.FC = () => {
       sx={{
         height: "calc(100% - 100px)",
         marginTop: "100px",
+        width: "100%",
         backgroundColor: "#121212",
         overflowY: "scroll",
         transition: "opacity 0.3s ease-in-out",

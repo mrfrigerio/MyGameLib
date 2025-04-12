@@ -279,10 +279,12 @@ export const LoginForm: React.FC<IDialogProps> = ({ isOpen, handleClose }) => {
                         </Box>
                       </Stack>
                       <Stack direction="row" spacing={1}>
-                        <TextField
-                          name={`addresses.${index}.state`}
-                          placeholder="Estado"
-                        />
+                        <Box sx={{ flex: 1 }}>
+                          <TextField
+                            name={`addresses.${index}.state`}
+                            placeholder="Estado"
+                          />
+                        </Box>
                         <Box>
                           <TextField
                             name={`addresses.${index}.city`}
