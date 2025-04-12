@@ -1,0 +1,48 @@
+version: "3.8"
+
+services:
+  backend:
+    container_name: my_game_lib_backend
+    build:
+      context: ./backend
+    ports:
+      - "3033:3033"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres:admin@db:5432/mygamelibrarydb
+    command: sh -c "npx prisma db push && npm start"
+    networks:
+      - mynet
+
+  frontend:
+    container_name: my_game_lib_frontend
+    build:
+      context: ./frontend
+    ports:
+      - "4173:4173"
+    depends_on:
+      - backend
+    networks:
+      - mynet
+
+  db:
+    image: postgres:15
+    container_name: my_game_lib_db
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: mygamelibrarydb
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - mynet
+
+volumes:
+  pgdata:
+
+networks:
+  mynet:
+    driver: bridge
