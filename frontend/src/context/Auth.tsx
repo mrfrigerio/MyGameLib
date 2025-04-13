@@ -54,32 +54,32 @@ interface AuthProviderProps {
 }
 
 // Utils para salvar e carregar em base64
-const encode = (data: unknown) => btoa(JSON.stringify(data));
-const decode = (encoded: string) => JSON.parse(atob(encoded));
+// const encode = (data: unknown) => btoa(JSON.stringify(data));
+// const decode = (encoded: string) => JSON.parse(atob(encoded));
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | undefined>();
   const isLogged = !!user;
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("@mgl");
-    if (storedUser) {
-      try {
-        const parsedUser = decode(storedUser);
-        setUser(parsedUser);
-      } catch (err) {
-        console.error("Erro ao decodificar usuário do localStorage", err);
-        localStorage.removeItem("@mgl");
-      }
-    }
-  }, []);
+  // useEffect(() => {
+  //   const storedUser = localStorage.getItem("@mgl");
+  //   if (storedUser) {
+  //     try {
+  //       const parsedUser = decode(storedUser);
+  //       setUser(parsedUser);
+  //     } catch (err) {
+  //       console.error("Erro ao decodificar usuário do localStorage", err);
+  //       localStorage.removeItem("@mgl");
+  //     }
+  //   }
+  // }, []);
 
   async function signIn(credentials: SignInCredentials) {
     try {
       const response = await api.post<User>("/auth/login", credentials);
       const user = response.data;
       setUser(user);
-      localStorage.setItem("@mgl", encode(user));
+      // localStorage.setItem("@mgl", encode(user));
       return user;
     } catch (error) {
       toast.error("E-mail ou senha inválidos!");
@@ -91,7 +91,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await api.post<User>("/users", credentials);
       const user = response.data;
       setUser(user);
-      localStorage.setItem("@mgl", encode(user));
+      // localStorage.setItem("@mgl", encode(user));
       return user;
     } catch (error: any) {
       console.log(error);
@@ -106,7 +106,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await api.put<User>(`/users/${user?.id}`, update);
       const updatedUser = response.data;
       setUser(updatedUser);
-      localStorage.setItem("@mgl", encode(updatedUser));
+      // localStorage.setItem("@mgl", encode(updatedUser));
       toast.success("Usuário atualizado com sucesso!");
       return updatedUser;
     } catch (error) {
@@ -117,7 +117,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   async function deleteUser(userId: number) {
     try {
       await api.delete(`/users/${userId}`);
-      localStorage.removeItem("@mgl");
+      // localStorage.removeItem("@mgl");
       setUser(undefined);
       toast.success("Usuário excluído com sucesso!");
     } catch (error) {
@@ -126,7 +126,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }
 
   function signOut() {
-    localStorage.removeItem("@mgl");
+    // localStorage.removeItem("@mgl");
     setUser(undefined);
   }
 

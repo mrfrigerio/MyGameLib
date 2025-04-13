@@ -1,11 +1,14 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useMemo, useState } from "react";
 import {
   Box,
   Stack,
   Typography,
   CircularProgress,
   LinearProgress,
+  Zoom,
+  Fab,
 } from "@mui/material";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import Masonry from "@mui/lab/Masonry";
 import { GameCard } from "../components/GameCard";
 import { HomeDropdown } from "../components/HomeDropdown";
@@ -19,6 +22,7 @@ export const Home: React.FC = () => {
   const { isLogged } = useAuth();
   const methods = useForm();
   const observerRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const { search } = useSearch();
   const platforms = methods.watch("platforms");
@@ -31,6 +35,31 @@ export const Home: React.FC = () => {
       platforms,
     });
 
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (containerRef.current) {
+        setShowScrollTop(containerRef.current.scrollTop > 300);
+      }
+    };
+
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener("scroll", handleScroll);
+    }
+
+    return () => {
+      if (container) {
+        container.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, []);
+
+  const scrollToTop = () => {
+    containerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -40,23 +69,27 @@ export const Home: React.FC = () => {
       },
       { threshold: 1.0 }
     );
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
-    }
+
+    const current = observerRef.current;
+    if (current) observer.observe(current);
 
     return () => {
-      if (observerRef.current) {
-        observer.unobserve(observerRef.current);
-      }
+      if (current) observer.unobserve(current);
     };
-  }, [hasNextPage, fetchNextPage]);
+  }, [hasNextPage]);
 
-  const games = data?.pages.flatMap((page) => page.results) || [];
+  const games = useMemo(() => {
+    return data?.pages.flatMap((page) => page.results) || [];
+  }, [data]);
+
+  const MemoizedGameCard = React.memo(GameCard);
 
   return (
     <Box
+      ref={containerRef}
       sx={{
         height: "calc(100% - 100px)",
+        position: "relative",
         marginTop: "100px",
         width: "100%",
         backgroundColor: "#121212",
@@ -71,7 +104,14 @@ export const Home: React.FC = () => {
         direction={{ xs: "column", sm: "column", md: "row" }}
         justifyContent="space-between"
         alignItems={{ xs: "start", sm: "start", md: "end" }}
-        sx={{ mb: 2, pr: 3, width: "100%" }}
+        sx={{
+          mb: 2,
+          pr: 3,
+          width: "100%",
+          paddingBottom: "10px",
+          top: 0,
+          left: 0,
+        }}
       >
         <Box>
           <Typography
@@ -113,6 +153,7 @@ export const Home: React.FC = () => {
           </Stack>
         </FormProvider>
       </Stack>
+
       {isLoading ? (
         <Box sx={{ textAlign: "center", mr: 3 }}>
           <LinearProgress
@@ -124,7 +165,7 @@ export const Home: React.FC = () => {
         <Masonry spacing={3} columns={{ xs: 1, sm: 2, md: 3, lg: 4, xl: 5 }}>
           {games.map((game: any) => (
             <Box key={game.id} sx={{ display: "flex", width: "100%" }}>
-              <GameCard gameId={game.id} />
+              <MemoizedGameCard gameId={game.id} />
             </Box>
           ))}
         </Masonry>
@@ -133,6 +174,28 @@ export const Home: React.FC = () => {
       <Box ref={observerRef} sx={{ p: 4, textAlign: "center" }}>
         {isFetchingNextPage && <CircularProgress />}
       </Box>
+
+      {/* Botão flutuante de scroll topo */}
+      <Zoom in={showScrollTop}>
+        <Fab
+          color="secondary"
+          onClick={scrollToTop}
+          sx={{
+            position: "fixed",
+            bottom: 32,
+            right: 32,
+            zIndex: 1000,
+            width: 40,
+            height: 40,
+            backgroundColor: "#308fe8",
+            "&:hover": {
+              backgroundColor: "#246bb3",
+            },
+          }}
+        >
+          <KeyboardArrowUpIcon />
+        </Fab>
+      </Zoom>
     </Box>
   );
 };

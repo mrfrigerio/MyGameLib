@@ -152,7 +152,11 @@ export const Library: React.FC = () => {
                   Imagem
                 </TableCell>
                 <TableCell
-                  sx={{ backgroundColor: "#1E1E1E", fontWeight: "bold" }}
+                  sx={{
+                    backgroundColor: "#1E1E1E",
+                    fontWeight: "bold",
+                    width: "160px",
+                  }}
                 >
                   Nome
                 </TableCell>
