@@ -24,6 +24,12 @@ Este projeto foi desenvolvido com as seguintes tecnologias:
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![Docker Compose](https://img.shields.io/badge/Docker_Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
+## 🧱 Arquitetura da Aplicação
+
+A arquitetura da aplicação está organizada em módulos bem definidos que se comunicam. O diagrama abaixo ilustra essa estrutura:
+
+![Diagrama da Arquitetura da Aplicação](./frontend/src/assets/arquitetura.png)
+
 ---
 
 ## ⚙️ Como rodar o projeto com Docker
