@@ -13,21 +13,95 @@ import {
 } from "react-icons/bs";
 import { FaApple, FaPlus } from "react-icons/fa";
 import { Box, Skeleton, Stack, Tooltip } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../service/api";
+import { useAuth } from "../../context/Auth";
+import { PiCardsThreeBold } from "react-icons/pi";
 
 interface IGameCardProps {
-  gameData: Game;
+  gameId: number;
 }
 
-export function GameCard({ gameData }: IGameCardProps) {
-  const { data: game, isLoading } = useQuery({
-    queryKey: ["game", gameData.id],
+export function GameCard({ gameId }: IGameCardProps) {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  const userGamesQuery = useQuery({
+    queryKey: ["userGames", { userId: user?.id }],
     queryFn: async () => {
-      const res = await api.get<Game>(`/games/${gameData.id}`);
+      const res = await api.get<IGameResponse[]>(`/library/${user?.id}`);
       return res.data;
     },
   });
+
+  const { data: game, isLoading } = useQuery({
+    queryKey: ["game", gameId],
+    queryFn: async () => {
+      const res = await api.get<GameDetails>(`/games/${gameId}`);
+      return res.data;
+    },
+    enabled: !!userGamesQuery.data,
+  });
+
+  function seededRandom(): number {
+    // Linear Congruential Generator params (valores clássicos)
+    if (game) {
+      const a = 1664525;
+      const c = 1013904223;
+      const m = 2 ** 32;
+
+      let seed = game?.id;
+
+      // Calcula valor pseudoaleatório normalizado (0 a 1)
+      seed = (a * seed + c) % m;
+      const random = seed / m;
+
+      // Escala o valor para o intervalo desejado: 140 a 200
+      const min = 140;
+      const max = 200;
+      return Math.floor(random * (max - min + 1)) + min;
+    }
+    return 140;
+  }
+
+  const addGameToLibrary = async (payload: IAddGameToUserLibrary) => {
+    const response = await api.post("/library", payload);
+    return response.data;
+  };
+
+  const addGameToUserMutation = useMutation({
+    mutationFn: addGameToLibrary,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["userGames", { userId: user?.id }],
+      });
+    },
+  });
+
+  const removeGameFromLibrary = async ({
+    userId,
+    gameId,
+  }: {
+    userId: number;
+    gameId: number;
+  }) => {
+    const response = await api.delete("/library", { data: { userId, gameId } });
+    return response.data;
+  };
+
+  const removeGameFromUserMutation = useMutation({
+    mutationFn: removeGameFromLibrary,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["userGames", { userId: user?.id }],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["userGames", { userId: user?.id }],
+      });
+    },
+  });
+
+  // useEffect(() => {}, [userGamesQuery.data]);
 
   return (
     <Card
@@ -51,7 +125,7 @@ export function GameCard({ gameData }: IGameCardProps) {
       ) : (
         <CardMedia
           component="img"
-          height={Math.floor(Math.random() * (200 - 140 + 1)) + 140}
+          height={seededRandom()}
           image={game?.background_image}
           alt={game?.name || ""}
         />
@@ -108,12 +182,41 @@ export function GameCard({ gameData }: IGameCardProps) {
               </Stack>
             }
           >
-            <IconButton
-              size="small"
-              sx={{ ml: "auto", mr: 1, backgroundColor: "#363636" }}
-            >
-              <FaPlus size={14} />
-            </IconButton>
+            {userGamesQuery.data?.find(
+              (gamesLib) => gamesLib.gameId === game?.id
+            ) ? (
+              <IconButton
+                size="small"
+                sx={{ ml: "auto", mr: 1, backgroundColor: "#363636" }}
+                onClick={() =>
+                  removeGameFromUserMutation.mutate({
+                    userId: user!.id,
+                    gameId: game!.id,
+                  })
+                }
+                disabled={removeGameFromUserMutation.isPending}
+              >
+                <PiCardsThreeBold color="#50FA7B" />
+              </IconButton>
+            ) : (
+              <IconButton
+                size="small"
+                sx={{ ml: "auto", mr: 1, backgroundColor: "#363636" }}
+                onClick={() =>
+                  addGameToUserMutation.mutate({
+                    gameId: game!.id,
+                    name: game!.name,
+                    description: game!.description,
+                    userId: user!.id,
+                    imageUrl: game!.background_image,
+                    metacritic: game!.metacritic,
+                  })
+                }
+                disabled={addGameToUserMutation.isPending}
+              >
+                <FaPlus size={14} />
+              </IconButton>
+            )}
           </Tooltip>
         )}
 

@@ -2,10 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { api } from "../service/api";
 
-type SignInCredentials = {
-  email: string;
-  password: string;
-};
+type SignInCredentials = { email: string; password: string };
 type SignUpCredentials = {
   name: string;
   email: string;
@@ -42,7 +39,7 @@ type updateCredentials = {
 interface IAuthContext {
   user: User | undefined;
   isLogged: boolean;
-  signIn: (signInCredentials: SignInCredentials) => Promise<User | undefined>;
+  signIn: (credentials: SignInCredentials) => Promise<User | undefined>;
   signUp: (credentials: SignUpCredentials) => Promise<User | undefined>;
   updateUser: (user: updateCredentials) => Promise<User | undefined>;
   deleteUser: (userId: string) => Promise<void>;
@@ -56,6 +53,10 @@ interface AuthProviderProps {
   children: React.ReactNode;
 }
 
+// Utils para salvar e carregar em base64
+const encode = (data: unknown) => btoa(JSON.stringify(data));
+const decode = (encoded: string) => JSON.parse(atob(encoded));
+
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | undefined>();
   const isLogged = !!user;
@@ -63,42 +64,51 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const storedUser = localStorage.getItem("@mgl");
     if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
+      try {
+        const parsedUser = decode(storedUser);
+        setUser(parsedUser);
+      } catch (err) {
+        console.error("Erro ao decodificar usuário do localStorage", err);
+        localStorage.removeItem("@mgl");
+      }
     }
   }, []);
 
-  async function signIn(signInCredentials: SignInCredentials) {
+  async function signIn(credentials: SignInCredentials) {
     try {
-      const response = await api.post<User>("/auth/login", {
-        email: signInCredentials.email,
-        password: signInCredentials.password,
-      });
-
+      const response = await api.post<User>("/auth/login", credentials);
       const user = response.data;
       setUser(user);
-
-      localStorage.setItem("@mgl", JSON.stringify(user));
-      return response.data;
+      localStorage.setItem("@mgl", encode(user));
+      return user;
     } catch (error) {
       toast.error("E-mail ou senha inválidos!");
     }
   }
 
-  async function updateUser(updateCredentials: updateCredentials) {
+  async function signUp(credentials: SignUpCredentials) {
     try {
-      const response = await api.put<User>(`/users/${user?.id}`, {
-        name: updateCredentials?.name,
-        email: updateCredentials?.email,
-        password: updateCredentials?.password,
-        addresses: updateCredentials?.addresses,
-      });
+      const response = await api.post<User>("/users", credentials);
+      const user = response.data;
+      setUser(user);
+      localStorage.setItem("@mgl", encode(user));
+      return user;
+    } catch (error: any) {
+      console.log(error);
+      toast.error(
+        `Falha no cadastro do usuário!\n${error?.response?.data?.message}`
+      );
+    }
+  }
 
-      const userData = response.data;
-      setUser(userData);
-      localStorage.setItem("@mgl", JSON.stringify(user));
+  async function updateUser(update: updateCredentials) {
+    try {
+      const response = await api.put<User>(`/users/${user?.id}`, update);
+      const updatedUser = response.data;
+      setUser(updatedUser);
+      localStorage.setItem("@mgl", encode(updatedUser));
       toast.success("Usuário atualizado com sucesso!");
-      return response.data;
+      return updatedUser;
     } catch (error) {
       toast.error("Falha na atualização do usuário!");
     }
@@ -115,30 +125,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }
 
-  async function signUp(signUpCredentials: SignUpCredentials) {
-    try {
-      const response = await api.post<User>("/users", {
-        name: signUpCredentials.name,
-        email: signUpCredentials.email,
-        password: signUpCredentials.password,
-        addresses: signUpCredentials.addresses,
-      });
-      const user = response.data;
-      setUser(user);
-
-      localStorage.setItem("@mgl", JSON.stringify(user));
-      return response.data;
-    } catch (error: any) {
-      console.log(error);
-      toast.error(
-        `Falha no cadastro do usuário!\n${error?.response?.data?.message}`
-      );
-    }
-  }
-
-  async function signOut() {
-    // Muito provavelmente o signOut não precisa ser async,
-    // basta apagar o user que o app deve funcionar.
+  function signOut() {
     localStorage.removeItem("@mgl");
     setUser(undefined);
   }

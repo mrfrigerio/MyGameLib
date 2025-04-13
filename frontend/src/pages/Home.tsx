@@ -124,7 +124,7 @@ export const Home: React.FC = () => {
         <Masonry spacing={3} columns={{ xs: 1, sm: 2, md: 3, lg: 4, xl: 5 }}>
           {games.map((game: any) => (
             <Box key={game.id} sx={{ display: "flex", width: "100%" }}>
-              <GameCard gameData={game} />
+              <GameCard gameId={game.id} />
             </Box>
           ))}
         </Masonry>
