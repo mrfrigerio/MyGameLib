@@ -69,7 +69,7 @@ export const EditProfile: React.FC = () => {
         isOpen={isOpen}
         handleClose={() => {
           methods.reset();
-          navigate("/");
+          navigate(-1);
           setIsOpen(false);
         }}
       />

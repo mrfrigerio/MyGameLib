@@ -132,7 +132,6 @@ export const EditProfileForm: React.FC<IDialogProps> = ({
       if (user) {
         await deleteUser(user.id).then(() => {
           signOut();
-          // handleClose();
         });
       }
     }
