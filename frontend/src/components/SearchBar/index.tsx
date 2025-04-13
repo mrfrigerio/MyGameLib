@@ -27,7 +27,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 const SearchBar: React.FC<{
   onSearch?: (query: string) => void;
   games?: number;
-}> = ({ onSearch, games }) => {
+}> = ({ onSearch }) => {
   const [query, setQuery] = useState("");
 
   const handleSearch = () => {

@@ -20,7 +20,7 @@ type SignUpCredentials = {
   }[];
 };
 type updateCredentials = {
-  id: string;
+  id: number;
   name?: string;
   email?: string;
   password?: string;
@@ -42,7 +42,7 @@ interface IAuthContext {
   signIn: (credentials: SignInCredentials) => Promise<User | undefined>;
   signUp: (credentials: SignUpCredentials) => Promise<User | undefined>;
   updateUser: (user: updateCredentials) => Promise<User | undefined>;
-  deleteUser: (userId: string) => Promise<void>;
+  deleteUser: (userId: number) => Promise<void>;
   signOut: () => void;
 }
 
@@ -114,7 +114,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }
 
-  async function deleteUser(userId: string) {
+  async function deleteUser(userId: number) {
     try {
       await api.delete(`/users/${userId}`);
       localStorage.removeItem("@mgl");
