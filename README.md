@@ -102,7 +102,7 @@ No diretório backend/, crie um arquivo .env com as credenciais adequadas (usuá
 cd backend
 npm install
 npx prisma db push
-npm run dev
+npm run start:dev
 ```
 
 API estará disponível em: http://localhost:3033
