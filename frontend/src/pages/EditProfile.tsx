@@ -1,26 +1,13 @@
-import React, { useEffect, useRef } from "react";
-import {
-  Box,
-  CircularProgress,
-  LinearProgress,
-  Stack,
-  Typography,
-} from "@mui/material";
-import Masonry from "@mui/lab/Masonry";
-import { GameCard } from "../components/GameCard";
+import React from "react";
+import { Box, Stack, Typography } from "@mui/material";
 import { EditProfileForm } from "../components/EditProfileForm";
-import { FormProvider, useForm } from "react-hook-form";
-import { HomeDropdown } from "../components/HomeDropdown";
 import { useNavigate } from "react-router";
-import { useGames } from "../hooks/useGames";
-import { useSearch } from "../context/Search";
+import { useForm } from "react-hook-form";
 
 export const EditProfile: React.FC = () => {
   const [isOpen, setIsOpen] = React.useState(true);
   const methods = useForm();
   const navigate = useNavigate();
-
-  const { search } = useSearch();
 
   return (
     <Box
