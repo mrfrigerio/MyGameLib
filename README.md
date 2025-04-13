@@ -51,7 +51,7 @@ cd my-game-library
 ## 2. Inicie os containers com Docker Compose:
 
 ```bash
-docker-compose up --build
+docker-compose up -d --build
 ```
 
 Acesse os serviços:
