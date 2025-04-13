@@ -4,7 +4,7 @@ import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { GamesService } from './games.service';
 import { QueryGamesDto } from './dto/query-games.dto';
 
-@ApiTags('Jogos')
+@ApiTags('3 - Jogos')
 @Controller('games')
 export class GamesController {
   constructor(private readonly gamesService: GamesService) {}
