@@ -80,9 +80,6 @@ export const HomeDropdown: React.FC<DropdownProps> = ({
             MenuProps={MenuProps}
             inputProps={{ "aria-label": "Without label" }}
           >
-            <MenuItem disabled value="">
-              <Typography variant="caption">{placeholder}</Typography>
-            </MenuItem>
             {values.map(({ label, value }) => (
               <MenuItem key={label + "-" + value} value={value}>
                 {label}
