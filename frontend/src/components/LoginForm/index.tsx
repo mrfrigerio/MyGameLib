@@ -93,6 +93,10 @@ export const LoginForm: React.FC<IDialogProps> = ({ isOpen, handleClose }) => {
   });
 
   useEffect(() => {
+    newUser ? methods.setFocus("name") : methods.setFocus("email");
+  }, [newUser]);
+
+  useEffect(() => {
     methods.reset();
   }, []);
 
@@ -350,12 +354,7 @@ export const LoginForm: React.FC<IDialogProps> = ({ isOpen, handleClose }) => {
             type="button"
             variant="text"
             fullWidth
-            onClick={() => {
-              setNewUser((oldUser: boolean) => {
-                oldUser ? methods.setFocus("name") : methods.setFocus("email");
-                return !newUser;
-              });
-            }}
+            onClick={setNewUser(!newUser)}
             sx={{
               fontSize: "12px",
               textTransform: "none",
