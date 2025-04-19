@@ -96,10 +96,6 @@ export const LoginForm: React.FC<IDialogProps> = ({ isOpen, handleClose }) => {
     newUser ? methods.setFocus("name") : methods.setFocus("email");
   }, [newUser]);
 
-  useEffect(() => {
-    methods.reset();
-  }, []);
-
   const { control, handleSubmit } = methods;
   const { fields } = useFieldArray({ control, name: "addresses" });
 
@@ -354,7 +350,7 @@ export const LoginForm: React.FC<IDialogProps> = ({ isOpen, handleClose }) => {
             type="button"
             variant="text"
             fullWidth
-            onClick={setNewUser(!newUser)}
+            onClick={() => setNewUser(!newUser)}
             sx={{
               fontSize: "12px",
               textTransform: "none",
