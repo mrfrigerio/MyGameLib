@@ -350,7 +350,12 @@ export const LoginForm: React.FC<IDialogProps> = ({ isOpen, handleClose }) => {
             type="button"
             variant="text"
             fullWidth
-            onClick={() => setNewUser(!newUser)}
+            onClick={() => {
+              setNewUser((oldUser: boolean) => {
+                oldUser ? methods.setFocus("name") : methods.setFocus("email");
+                return !newUser;
+              });
+            }}
             sx={{
               fontSize: "12px",
               textTransform: "none",
